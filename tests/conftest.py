@@ -1,6 +1,10 @@
 import os
 import sys
 
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -11,10 +15,6 @@ from app.db.base import Base
 from app.db.session import get_db
 from app.main import create_app
 from app.models.user import User
-
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if ROOT_DIR not in sys.path:
-    sys.path.insert(0, ROOT_DIR)
 
 TEST_DATABASE_URL = "sqlite:///./test.db"
 
