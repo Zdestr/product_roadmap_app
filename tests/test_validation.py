@@ -33,9 +33,9 @@ def test_milestone_cannot_be_in_past(client, auth_headers):
 
 
 def test_owner_only_access(client, db_session, test_user):
-    from app.core.security import get_password_hash, create_access_token
-    from app.models.user import User
+    from app.core.security import create_access_token, get_password_hash
     from app.models.roadmap import Roadmap
+    from app.models.user import User
 
     other_user = User(
         email="other@example.com",

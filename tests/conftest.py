@@ -1,13 +1,16 @@
 import os
-import pytest
 import sys
+
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.main import create_app
+from app.core.security import create_access_token, get_password_hash
 from app.db.base import Base
 from app.db.session import get_db
+from app.main import create_app
+from app.models.user import User
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ROOT_DIR not in sys.path:
@@ -81,11 +84,6 @@ def db_session(setup_test_db):
         yield db
     finally:
         db.close()
-
-from app.core.security import get_password_hash
-from app.models.user import User
-from app.core.security import create_access_token
-import pytest
 
 
 @pytest.fixture()

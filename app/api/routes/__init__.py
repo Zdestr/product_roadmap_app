@@ -2,8 +2,8 @@
 from fastapi import APIRouter
 
 from app.api.routes.auth import router as auth_router
-from app.api.routes.roadmaps import router as roadmaps_router
 from app.api.routes.milestones import router as milestones_router
+from app.api.routes.roadmaps import router as roadmaps_router
 from app.api.routes.stats import router as stats_router
 
 api_router = APIRouter()

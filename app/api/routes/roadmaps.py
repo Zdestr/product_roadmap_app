@@ -1,14 +1,14 @@
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_active_user
-from app.db.session import get_db
-from app.models.user import User
-from app.models.roadmap import Roadmap
-from app.schemas.roadmap import RoadmapCreate, RoadmapRead, RoadmapUpdate
 from app.api.utils import tags_list_to_string, tags_string_to_list
+from app.db.session import get_db
+from app.models.roadmap import Roadmap
+from app.models.user import User
+from app.schemas.roadmap import RoadmapCreate, RoadmapRead, RoadmapUpdate
 
 router = APIRouter(prefix="/roadmaps", tags=["roadmaps"])
 
@@ -138,6 +138,7 @@ def export_roadmap(
     current_user: User = Depends(get_current_active_user),
 ):
     from fastapi.responses import JSONResponse, PlainTextResponse
+
     from app.models.milestone import Milestone
 
     roadmap = _get_owned_roadmap_or_404(roadmap_id, db, current_user)
@@ -206,5 +207,7 @@ def export_roadmap(
     return PlainTextResponse(
         content=output.getvalue(),
         media_type="text/csv",
-        headers={"Content-Disposition": f'attachment; filename="roadmap_{roadmap.id}.csv"'},
+        headers={
+            "Content-Disposition": f'attachment; filename="roadmap_{roadmap.id}.csv"'
+        },
     )
