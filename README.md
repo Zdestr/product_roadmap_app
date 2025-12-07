@@ -1,3 +1,5 @@
+![CI](https://github.com/Zdestr/product_roadmap_app/actions/workflows/ci.yml/badge.svg)
+
 ```markdown
 # Product Roadmap API
 

@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from typing import Dict
+
+from pydantic import BaseModel
 
 from app.models.milestone import MilestoneStatus
 
@@ -10,4 +11,3 @@ class StatsResponse(BaseModel):
     milestones_by_status: Dict[MilestoneStatus, int]
     overdue_milestones: int
     upcoming_milestones_7d: int
-

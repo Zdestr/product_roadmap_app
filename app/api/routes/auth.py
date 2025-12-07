@@ -5,11 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.security import (
-    verify_password,
-    get_password_hash,
-    create_access_token,
-)
+from app.core.security import create_access_token, get_password_hash, verify_password
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import Token
@@ -53,5 +49,7 @@ def login_for_access_token(
         )
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(subject=user.id, expires_delta=access_token_expires)
+    access_token = create_access_token(
+        subject=user.id, expires_delta=access_token_expires
+    )
     return Token(access_token=access_token)

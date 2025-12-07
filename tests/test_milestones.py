@@ -51,4 +51,6 @@ def test_create_milestone_due_in_past_fails(client, auth_headers):
         },
         headers=auth_headers,
     )
-    assert resp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY  # сработала pydantic-валидация
+    assert (
+        resp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    )  # сработала pydantic-валидация

@@ -1,0 +1,7 @@
+[tool.ruff]
+line-length = 88
+extend-ignore = ["E402"]
+
+[tool.isort]
+profile = "black"
+line_length = 88

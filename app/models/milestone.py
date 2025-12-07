@@ -1,15 +1,7 @@
-from datetime import datetime, date
 import enum
+from datetime import datetime
 
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    Date,
-    DateTime,
-    Enum,
-    ForeignKey,
-)
+from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -26,7 +18,9 @@ class Milestone(Base):
     __tablename__ = "milestones"
 
     id = Column(Integer, primary_key=True, index=True)
-    roadmap_id = Column(Integer, ForeignKey("roadmaps.id", ondelete="CASCADE"), nullable=False)
+    roadmap_id = Column(
+        Integer, ForeignKey("roadmaps.id", ondelete="CASCADE"), nullable=False
+    )
 
     title = Column(String(255), nullable=False, index=True)
     description = Column(String, nullable=True)
