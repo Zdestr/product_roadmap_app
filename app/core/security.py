@@ -8,6 +8,9 @@ from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
+JWT_SECRET_KEY: str = settings.SECRET_KEY.get_secret_value()
+JWT_ALGORITHM: str = settings.ALGORITHM
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -25,10 +28,11 @@ def create_access_token(
         expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     expire = datetime.utcnow() + expires_delta
     to_encode: dict[str, Any] = {"sub": str(subject), "exp": expire}
+
     encoded_jwt = jwt.encode(
         to_encode,
-        settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM,
+        JWT_SECRET_KEY,
+        algorithm=JWT_ALGORITHM,
     )
     return encoded_jwt
 
@@ -37,8 +41,8 @@ def decode_access_token(token: str) -> dict[str, Any]:
     try:
         payload = jwt.decode(
             token,
-            settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM],
+            JWT_SECRET_KEY,
+            algorithms=[JWT_ALGORITHM],
         )
         return payload
     except JWTError as e:
