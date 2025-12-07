@@ -1,17 +1,12 @@
-mkdir -p policy
-
-cat > policy/waivers.yml << 'EOF'
-
 waivers:
-
-  - id: "CVE-YYYY-XXXX"
-    package: "example-package"
-    version: "0.0.0"
+  - id: "CVE-2024-53981"
+    package: "python-multipart"
+    version: "0.0.9"
     severity: "High"
     reason: >
-      Транзитивная зависимость; на текущий момент нет совместимого фикса.
-      Компонент не используется в критическом прод-пути и риск оценён как приемлемый.
-    issue: "https://github.com/Zdestr/product_roadmap_app/issues/123"
-    expires_at: "2025-12-07"
+      Уязвимость DoS в python-multipart; на текущий момент невозможно обновить
+      до 0.0.18 из-за несовместимости с нашим стеком. Компонент используется
+      только во внутреннем окружении, риск оценён как приемлемый до миграции.
+    issue: "https://github.com/Zdestr/product_roadmap_app/issues/5"
+    expires_at: "2025-12-31"
     approved_by: "mrtugov"
-EOF
