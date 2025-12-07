@@ -31,13 +31,15 @@ jobs:
       - name: Ensure evidence dirs
         run: mkdir -p "$EVIDENCE_DIR"
 
-      # SBOM: Syft, CycloneDX JSON, фиксированная версия (репродьюсабельность)
-      - name: Generate SBOM (Syft CycloneDX)
+      # SBOM: Syft JSON (syft-json), фиксированная версия для воспроизводимости
+      - name: Generate SBOM (Syft JSON)
+        env:
+          SYFT_LOG: error
         run: |
-          docker run --rm -v "$PWD":/work -w /work anchore/syft:v1.27.1 \
-            packages dir:. -o cyclonedx-json > "$EVIDENCE_DIR/sbom.json"
+          docker run --rm -e SYFT_LOG=error -v "$PWD":/work -w /work anchore/syft:v1.27.1 \
+            dir:. -o syft-json > "$EVIDENCE_DIR/sbom.json"
 
-      # SCA: Grype по SBOM, подробный отчёт + сводка
+      # SCA: Grype по SBOM (syft-json), фиксированная версия
       - name: SCA Scan (Grype)
         run: |
           set -e
@@ -76,7 +78,6 @@ jobs:
                 | .[:10]' "$EVIDENCE_DIR/sca_report.json" || echo "[]"
           } > "$EVIDENCE_DIR/sca_summary.md"
 
-      # Пока только логируем High/Critical, без падения CI
       - name: Log High/Critical vuln count (no fail)
         run: |
           high_crit_count=$(jq '[.matches[]
