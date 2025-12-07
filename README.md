@@ -1,6 +1,8 @@
 ```markdown
 # Product Roadmap API
 
+![CI](https://github.com/Zdestr/product_roadmap_app/actions/workflows/ci.yml/badge.svg)
+
 Сервис для управления планом развития продукта / учебного курса:
 
 - пользователи (`User`);
