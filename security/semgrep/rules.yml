@@ -1,0 +1,28 @@
+rules:
+  - id: python-hardcoded-secret-key
+    languages: [python]
+    message: "Hardcoded SECRET_KEY detected. Use environment variables in production."
+    severity: WARNING
+    patterns:
+      - pattern: |
+          SECRET_KEY: str = "CHANGE_ME_IN_PRODUCTION"
+    paths:
+      include:
+        - "app/core/config.py"
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+      references:
+        - "https://fastapi.tiangolo.com/advanced/behind-a-proxy/#security-consideration"
+
+  - id: python-avoid-eval-exec
+    languages: [python]
+    message: "Avoid using eval/exec on dynamic input. Use safer alternatives."
+    severity: WARNING
+    patterns:
+      - pattern-either:
+          - pattern: eval($X)
+          - pattern: exec($X)
+    metadata:
+      category: security
+      cwe: "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"
