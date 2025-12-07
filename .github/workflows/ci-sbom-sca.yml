@@ -1,0 +1,100 @@
+name: Security - SBOM & SCA
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "**/*.py"
+      - "requirements*.txt"
+      - ".github/workflows/ci-sbom-sca.yml"
+      - "policy/waivers.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  EVIDENCE_DIR: EVIDENCE/P09
+
+jobs:
+  sbom_sca:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure evidence dirs
+        run: mkdir -p "$EVIDENCE_DIR"
+
+      # SBOM: Syft JSON (syft-json), фиксированная версия для воспроизводимости
+      - name: Generate SBOM (Syft JSON)
+        env:
+          SYFT_LOG: error
+        run: |
+          docker run --rm -e SYFT_LOG=error -v "$PWD":/work -w /work anchore/syft:v1.27.1 \
+            dir:. -o syft-json > "$EVIDENCE_DIR/sbom.json"
+
+      # SCA: Grype по SBOM (syft-json), фиксированная версия
+      - name: SCA Scan (Grype)
+        run: |
+          set -e
+
+          docker run --rm -v "$PWD":/work -w /work anchore/grype:v0.79.1 \
+            sbom:/work/$EVIDENCE_DIR/sbom.json -o json > "$EVIDENCE_DIR/sca_report.json"
+
+          COMMIT_SHA="${GITHUB_SHA}"
+          BRANCH_NAME="${GITHUB_REF_NAME:-unknown}"
+
+          {
+            echo "# SCA summary"
+            echo
+            echo "- Commit: \`$COMMIT_SHA\`"
+            echo "- Branch: \`$BRANCH_NAME\`"
+            echo "- Generated at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+            echo
+            echo "## Severity counts (all vulnerabilities)"
+            jq '[.matches[].vulnerability.severity] 
+                | group_by(.) 
+                | map({(.[0]): length}) 
+                | add' "$EVIDENCE_DIR/sca_report.json" || echo "{}"
+            echo
+            echo "## Top High/Critical vulnerabilities (up to 10)"
+            jq '[
+                  .matches[]
+                  | select(.vulnerability.severity=="High" or .vulnerability.severity=="Critical")
+                  | {
+                      id: .vulnerability.id,
+                      severity: .vulnerability.severity,
+                      package: .artifact.name,
+                      version: .artifact.version
+                    }
+                ]
+                | unique
+                | .[:10]' "$EVIDENCE_DIR/sca_report.json" || echo "[]"
+          } > "$EVIDENCE_DIR/sca_summary.md"
+
+      - name: Log High/Critical vuln count (no fail)
+        run: |
+          high_crit_count=$(jq '[.matches[]
+                                 | .vulnerability.severity
+                                 | select(.=="High" or .=="Critical")] 
+                               | length' "$EVIDENCE_DIR/sca_report.json")
+          echo "High/Critical vulnerability count: $high_crit_count"
+
+      - name: Copy waivers into evidence
+        run: |
+          if [ -f policy/waivers.yml ]; then
+            cp policy/waivers.yml "$EVIDENCE_DIR/waivers.yml"
+          fi
+
+      - name: Upload SBOM/SCA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P09_EVIDENCE
+          path: ${{ env.EVIDENCE_DIR }}
