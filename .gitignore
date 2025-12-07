@@ -1,0 +1,32 @@
+# Виртуальное окружение
+.venv/
+venv/
+
+# Python артефакты
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+
+# Базы данных
+*.db
+*.sqlite3
+
+# Логи
+*.log
+
+# Тестовые артефакты
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE и редакторы
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Секреты и локальная конфигурация
+.env
+.env.*
