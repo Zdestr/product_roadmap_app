@@ -53,7 +53,10 @@ jobs:
 
       - name: Run ZAP Baseline scan
         run: |
-          docker run --rm --network host -v "$PWD":/zap/wrk ghcr.io/zaproxy/zaproxy:stable \
+          mkdir -p zap-wrk EVIDENCE/P11
+          chmod 777 zap-wrk
+
+          docker run --rm --network host -v "$PWD/zap-wrk":/zap/wrk ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
               -t http://localhost:8080 \
               -r zap_baseline.html \
@@ -61,7 +64,13 @@ jobs:
               -d \
               -m 5 || true
 
-          mv zap_baseline.* EVIDENCE/P11/ || true
+          echo "Содержимое zap-wrk после запуска ZAP:"
+          ls -la zap-wrk || echo "zap-wrk пуст"
+          mv zap-wrk/zap_baseline.* EVIDENCE/P11/ || true
+
+          echo "Содержимое EVIDENCE/P11 после mv:"
+          ls -la EVIDENCE/P11 || echo "EVIDENCE/P11 пуст"
+
 
 
       - name: Upload P11 evidence
