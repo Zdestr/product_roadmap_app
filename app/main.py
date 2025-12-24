@@ -13,6 +13,10 @@ def create_app() -> FastAPI:
     def on_startup():
         Base.metadata.create_all(bind=engine)
 
+    @app.get("/healthz")
+    def healthz():
+        return {"status": "ok"}
+
     app.include_router(api_router, prefix=settings.API_V1_PREFIX)
     return app
 
