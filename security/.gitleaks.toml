@@ -1,0 +1,16 @@
+title = "product_roadmap_app gitleaks config"
+
+[extend]
+
+[allowlist]
+description = "Allowlist for known non-sensitive patterns and files"
+
+paths = [
+  "EVIDENCE/",
+]
+
+commits = []
+
+regexes = [
+  '''TEST_SECRET_DO_NOT_USE''',
+]
