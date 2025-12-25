@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  product_roadmap_app:
+    image: product-roadmap-app:local
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=sqlite:///./app.db
+    restart: unless-stopped
